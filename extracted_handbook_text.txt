@@ -1,0 +1,324 @@
+AI ENGINEERING + LANGCHAIN
+Weeks 1–2 • Beginner-Friendly Hands-On Handbook
+Every concept = simple meaning + real-life analogy + tiny runnable example
+Learning rule: Run the smallest example first. Then change one value and run it again. Understanding the change is more important than memorizing the code.
+0. Setup
+You can use Python 3.10+ for these exercises.
+python -m venv .venvsource .venv/bin/activate       # Linux/macOS# Windows: .venv\Scripts\activatepip install python-dotenv pydantic langchain langchain-core langchain-groq langchain-mistralai langchain-google-genai
+API keys: Keep keys in .env files and never commit them to Git. Provider model names change, so use a currently available model from the provider dashboard.
+Basic .env example
+GROQ_API_KEY=your_keyMISTRAL_API_KEY=your_keyGOOGLE_API_KEY=your_key
+WEEK 1 — AI ENGINEERING FOUNDATIONS
+Goal: understand what an LLM application is before using a framework.
+1. AI Engineering
+In simple words: Building software where AI models are a working part of the application.
+Real-life example: A payroll application might use normal code for salary calculations but use an LLM to answer an employee's question in natural language.
+Tiny runnable example:
+user_text = "Explain my salary slip"prompt = f"Answer this employee question clearly: {user_text}"print(prompt)
+What to observe: The prompt is only one piece. A real AI feature also needs data, model calls, validation, error handling, security, and UI.
+2. Generative AI
+In simple words: AI that generates new content instead of only classifying or retrieving existing content.
+Real-life example: A search box finds an existing page; a generative assistant can write a new explanation based on your question.
+Tiny runnable example:
+sentence = "Generative AI can create a new explanation for a question."print(sentence)
+What to observe: This is a concept-only example; later you will send the same idea to a real model.
+3. AI Agent
+In simple words: An AI system that can decide to use one or more tools to complete a task.
+Real-life example: A travel assistant may check flights, check weather, and then answer you.
+Tiny runnable example:
+tools = ["calculator", "weather", "database"]print("Available tools:", tools)
+What to observe: Having tools available is not automatically an agent. The system needs a decision-making loop that selects and uses tools.
+4. Agentic AI
+In simple words: A broader way of designing software where an AI system can plan, act, observe results, and continue toward a goal.
+Real-life example: A human employee receives a goal, performs several steps, checks the result, and fixes mistakes.
+Tiny runnable example:
+steps = ["plan", "act", "observe", "adjust"]for step in steps:    print(step)
+What to observe: Agentic systems usually involve multiple steps rather than one model call.
+5. Traditional Software vs LLM Software
+In simple words: Traditional software usually follows explicitly programmed rules; LLM software handles language and probabilistic generation.
+Real-life example: A calculator always follows arithmetic rules. A chatbot can produce different wording for the same question.
+Tiny runnable example:
+a = 10b = 20print("Traditional code:", a + b)question = "Explain 30 in simple words"print("LLM application input:", question)
+What to observe: Traditional code gives deterministic arithmetic; an LLM adds a probabilistic language-generation layer.
+6. Tokens
+In simple words: A token is a small piece of text that the model processes.
+Real-life example: Think of a sentence being cut into LEGO pieces before a machine can work with it.
+Tiny runnable example:
+text = "Hello AI"tokens = text.split()print(tokens)print("Toy token count:", len(tokens))
+What to observe: This is only a teaching approximation. Real tokenizers do not simply split on spaces.
+7. Context Window
+In simple words: The amount of input/output context a model can consider in one interaction.
+Real-life example: Imagine a person who can keep only a certain number of pages open on a desk.
+Tiny runnable example:
+context = ["user question", "previous answer", "document", "instructions"]print("Items in our toy context:", len(context))
+What to observe: Larger context windows let applications provide more information, but more context can also increase cost and processing.
+8. Transformer — High Level
+In simple words: The architecture behind modern LLMs that lets the model process relationships between tokens efficiently.
+Real-life example: While reading a sentence, you connect words to other important words rather than reading every word in isolation.
+Tiny runnable example:
+sentence = "The developer fixed the bug."print("Important relationship: developer -> fixed -> bug")
+What to observe: You do not need transformer mathematics yet. For now remember: attention helps the model relate pieces of context.
+9. Temperature
+In simple words: Temperature controls how adventurous or predictable model output tends to be.
+Real-life example: At a restaurant, low temperature is like ordering the chef's standard recipe; higher temperature is like asking for more creative variations.
+Tiny runnable example:
+temperatures = [0.0, 0.3, 0.8, 1.2]for t in temperatures:    print("Temperature:", t)
+What to observe: In actual model calls, lower values usually make responses more consistent and higher values usually allow more variation. Exact behavior depends on the provider/model.
+10. Top-p
+In simple words: Top-p limits the pool of candidate next tokens using cumulative probability.
+Real-life example: Imagine a teacher choosing an answer only from the most likely group of answers until the group contains enough probability.
+Tiny runnable example:
+top_p = 0.9print("Candidate probability pool:", top_p)
+What to observe: Temperature and top-p both affect randomness. When learning, change one at a time so you can understand its effect.
+11. Max Output Tokens
+In simple words: A limit on how much the model can generate in its response.
+Real-life example: Like telling a speaker: 'You have only 50 seconds to answer.'
+Tiny runnable example:
+max_tokens = 50print("Maximum output token setting:", max_tokens)
+What to observe: A low limit can cut off a response. Provider parameter names and exact limits can differ.
+12. Hallucination
+In simple words: When an AI gives information that sounds confident but is incorrect or unsupported.
+Real-life example: A new employee confidently tells you a company policy that they never actually checked.
+Tiny runnable example:
+claim = "The fictional company ABC was founded on Mars in 1920."print("Do not trust a claim just because it sounds confident:", claim)
+What to observe: Always verify important facts. Retrieval, tools, citations, validation, and business rules can reduce hallucination risk.
+13. Reasoning Models
+In simple words: Models optimized for solving more complex multi-step problems rather than only producing quick conversational responses.
+Real-life example: A simple calculator answer needs little planning; solving a complex engineering problem needs several reasoning steps.
+Tiny runnable example:
+problem = ["understand", "break into steps", "solve", "check"]print("Toy reasoning workflow:", problem)
+What to observe: Do not assume a reasoning model is automatically better for every task. Speed, cost, quality, and task type matter.
+14. Chat Models
+In simple words: Models designed to work naturally with conversational messages and roles.
+Real-life example: A support agent sees a company instruction, then the customer's message, then gives a reply.
+Tiny runnable example:
+messages = [    ("system", "Be helpful"),    ("human", "What is LangChain?"),]for role, text in messages:    print(role, "->", text)
+What to observe: This message-based mental model becomes important in Week 2.
+15. LLM Providers
+A provider is a company/platform that gives you access to AI models through APIs. Examples include OpenAI, Anthropic, Google, Groq, and Mistral.
+Provider API
+In simple words: An API is a defined way for your application to ask another service to do something.
+Real-life example: Your food-delivery app sends an order to a restaurant system through an agreed interface.
+Tiny runnable example:
+request = {"model": "some-model", "input": "Hello"}print("Example API request:", request)
+What to observe: The actual provider API sends this request over HTTP and returns a response.
+Provider SDK
+In simple words: An SDK is a library that wraps the provider API so you can call it from code more conveniently.
+Real-life example: Instead of calling a restaurant by manually constructing every detail of the order, you use the restaurant's official app.
+Tiny runnable example:
+# Conceptual SDK objectclass ProviderSDK:    def generate(self, text):        return "Model response for: " + textclient = ProviderSDK()print(client.generate("Hello"))
+What to observe: Real SDKs handle details such as HTTP requests, authentication, request formatting, responses, and often streaming.
+Raw HTTP vs SDK vs LangChain
+In simple words: These are three layers of abstraction: direct HTTP is lowest-level, a provider SDK is provider-specific convenience, and LangChain adds application-level abstractions.
+Real-life example: A car can be controlled by engine components, by the driver's controls, or through a higher-level navigation system.
+Tiny runnable example:
+print("Raw HTTP  -> provider API")print("SDK       -> provider library")print("LangChain -> orchestration/abstraction layer")
+What to observe: LangChain does not replace the model. It helps compose model calls with prompts, messages, tools, schemas, and other components.
+Week 1 Practice Lab
+Run the temperature example and change 0.0, 0.3, 0.8, and 1.2.
+Write one example where hallucination could hurt a business.
+Draw: Application → API/SDK → Model.
+Compare two providers on speed, quality, context, pricing, and coding ability.
+Explain in your own words: API vs SDK vs LangChain.
+WEEK 2 — LANGCHAIN FUNDAMENTALS
+Goal: understand LangChain as a set of reusable building blocks for LLM applications.
+16. What is LangChain?
+In simple words: A framework/library for composing LLM applications using reusable abstractions such as models, messages, prompts, tools, structured output, and runnables.
+Real-life example: A construction kit: instead of building every part from raw materials every time, you reuse standard components.
+Tiny runnable example:
+print("Prompt -> Model -> Output")print("LangChain helps connect these components.")
+What to observe: LangChain is not an AI model and does not magically make a model smarter.
+17. LangChain Model Integration
+In simple words: LangChain provides integrations so different model providers can be used through similar application patterns.
+Real-life example: Different brands of printers have different drivers, but your application can use a common printing workflow.
+Tiny runnable example:
+from langchain_core.messages import HumanMessageprint(HumanMessage(content="Hello LangChain"))
+What to observe: Provider integrations such as langchain-groq and langchain-mistralai connect LangChain to specific providers.
+18. Tiny Real Model Example — Groq
+Use this after installing langchain-groq and setting GROQ_API_KEY.
+from langchain_groq import ChatGroqllm = ChatGroq(    model="YOUR_CURRENT_GROQ_MODEL",    temperature=0)response = llm.invoke("Explain temperature in one sentence.")print(response.content)
+What happens: Your Python code → LangChain Groq integration → provider API → model → response.
+19. Tiny Real Model Example — Mistral
+Use a currently available Mistral model from your account.
+from langchain_mistralai import ChatMistralAIllm = ChatMistralAI(    model="YOUR_CURRENT_MISTRAL_MODEL",    temperature=0)response = llm.invoke("Explain an API in one sentence.")print(response.content)
+Important: Do not use ChatOpenAI just because the model is an LLM. Provider integrations should match the provider unless you intentionally use a compatible endpoint.
+20. LangChain Messages
+Messages make conversations explicit instead of treating everything as one plain string.
+SystemMessage
+In simple words: Instructions that describe how the AI should behave.
+Real-life example: A manager tells a support employee: 'Always be polite and concise.'
+Tiny runnable example:
+from langchain_core.messages import SystemMessagem = SystemMessage(content="You are a polite tutor.")print(m.type, m.content)
+What to observe: The system message is application-level guidance.
+HumanMessage
+In simple words: The user's input/question.
+Real-life example: A customer tells the support employee: 'I cannot log in.'
+Tiny runnable example:
+from langchain_core.messages import HumanMessagem = HumanMessage(content="I cannot log in.")print(m.type, m.content)
+What to observe: HumanMessage normally represents the user's request.
+AIMessage
+In simple words: A message representing model-generated content.
+Real-life example: The support employee replies: 'Let me help you reset your password.'
+Tiny runnable example:
+from langchain_core.messages import AIMessagem = AIMessage(content="Let me help you reset your password.")print(m.type, m.content)
+What to observe: AIMessage can also carry tool-call information when a model decides to use a tool.
+ToolMessage
+In simple words: A message containing the result returned by a tool.
+Real-life example: The support employee asks an account system for the user's account status, and the system returns the result.
+Tiny runnable example:
+from langchain_core.messages import ToolMessagem = ToolMessage(content="Account is active.", tool_call_id="demo-call")print(m.type, m.content)
+What to observe: ToolMessage represents tool output that can be supplied back into the conversation.
+Message Flow With Tools
+HumanMessage    ↓AIMessage (requests a tool)    ↓Tool executes    ↓ToolMessage (tool result)    ↓AIMessage (final response)
+21. Model Invocation
+invoke()
+In simple words: Run a model call and wait for the complete result.
+Real-life example: Call a restaurant, wait for the full answer, then continue.
+Tiny runnable example:
+# Works with a configured LangChain model:# response = llm.invoke("Hello")# print(response.content)print("invoke = wait for complete result")
+What to observe: Use invoke for simple synchronous calls.
+ainvoke()
+In simple words: Run the model call asynchronously.
+Real-life example: Start a delivery request without freezing the rest of your restaurant app.
+Tiny runnable example:
+import asyncioasync def main():    print("ainvoke = asynchronous model call")    # response = await llm.ainvoke("Hello")    # print(response.content)asyncio.run(main())
+What to observe: Async is mainly about application concurrency/non-blocking I/O; it does not magically make the model generate faster.
+stream()
+In simple words: Receive the response progressively in chunks.
+Real-life example: Instead of waiting for a whole speech, you hear the speaker sentence by sentence.
+Tiny runnable example:
+chunks = ["Hello", " ", "from", " ", "AI"]for chunk in chunks:    print(chunk, end="", flush=True)
+What to observe: In a real model call, llm.stream(...) can produce chunks as output arrives.
+astream()
+In simple words: Asynchronous streaming of output chunks.
+Real-life example: A live caption system receives speech pieces while other application work continues.
+Tiny runnable example:
+import asyncioasync def main():    for chunk in ["Hello", " ", "async"]:        print(chunk, end="", flush=True)asyncio.run(main())
+What to observe: With a real LangChain model, use async iteration over llm.astream(...).
+22. Prompt Templates
+Reusable Prompt Template
+In simple words: A prompt template is a reusable prompt with variables.
+Real-life example: A letter template has blank spaces for name and date that you fill in each time.
+Tiny runnable example:
+from langchain_core.prompts import ChatPromptTemplateprompt = ChatPromptTemplate.from_template(    "Explain {topic} in simple words.")messages = prompt.invoke({"topic": "temperature"})print(messages)
+What to observe: The prompt stays reusable while the topic changes.
+Chat Prompt Template
+In simple words: A template can contain system and human roles.
+Real-life example: A teacher has standing instructions plus the student's question.
+Tiny runnable example:
+from langchain_core.prompts import ChatPromptTemplateprompt = ChatPromptTemplate.from_messages([    ("system", "You are a beginner-friendly {role}."),    ("human", "Explain {topic}.")])messages = prompt.invoke({    "role": "Python tutor",    "topic": "lists"})print(messages)
+What to observe: Separating roles makes prompts easier to reuse and maintain.
+Prompt → Model Chain
+In simple words: LangChain lets components be composed into a pipeline.
+Real-life example: A factory line takes raw material through station 1, station 2, and station 3.
+Tiny runnable example:
+from langchain_core.prompts import ChatPromptTemplateprompt = ChatPromptTemplate.from_template(    "Explain {topic} simply.")print("Pipeline concept: prompt | model")# chain = prompt | llm# response = chain.invoke({"topic": "API"})
+What to observe: The pipe operator | composes runnable components.
+23. Pydantic and Structured Output
+Pydantic Schema
+In simple words: A Python class that describes the fields and types your data should contain.
+Real-life example: A form says: name must be text, age must be a number, department must be text.
+Tiny runnable example:
+from pydantic import BaseModelclass Employee(BaseModel):    name: str    age: int    department: stremployee = Employee(    name="John",    age=25,    department="Development")print(employee)
+What to observe: Pydantic validates the structure and basic types of the data.
+Structured LLM Output
+In simple words: Instead of accepting free-form text, you can ask a supported LangChain model to return data matching a schema.
+Real-life example: A receptionist does not write a random note; they fill fixed fields in a form.
+Tiny runnable example:
+from pydantic import BaseModelclass Employee(BaseModel):    name: str    age: int    department: strprint("Expected fields:", list(Employee.model_fields))
+What to observe: With a real model, llm.with_structured_output(Employee) asks the model/integration for this structure. Pydantic checks the resulting data; it does not prove the facts are true.
+24. if __name__ == '__main__'
+In simple words: This makes a block run when a file is executed directly, but not when that file is imported.
+Real-life example: A shop opens its doors when the shop is run, but importing the shop's inventory module should not open the store.
+Tiny runnable example:
+def hello():    print("Hello")if __name__ == "__main__":    hello()
+What to observe: If another file imports hello(), the hello() call inside the main guard does not automatically run.
+25. Put the Pieces Together
+This is the mental model you should now have:
+User ↓Prompt Template ↓Messages ↓LangChain Model Integration ↓Provider API / SDK ↓LLM ↓Structured Output / Parser ↓Your Application
+Key idea: LangChain is an orchestration layer. The provider owns the model and API. Your application owns the business logic.
+26. Mini Project — Employee Question Assistant
+Build this in small steps instead of trying to create an agent immediately.
+Step 1 — Plain question
+question = "What is PF?"print(question)
+Step 2 — Add a reusable prompt
+from langchain_core.prompts import ChatPromptTemplateprompt = ChatPromptTemplate.from_messages([    ("system", "You explain HR concepts to employees in simple language."),    ("human", "{question}")])print(prompt.invoke({"question": "What is PF?"}))
+Step 3 — Add a model
+# llm = ChatGroq(model="YOUR_CURRENT_GROQ_MODEL", temperature=0)# chain = prompt | llm# response = chain.invoke({"question": "What is PF?"})# print(response.content)
+Step 4 — Add structured output
+from pydantic import BaseModelclass Answer(BaseModel):    topic: str    answer: str    confidence_note: str# structured_llm = llm.with_structured_output(Answer)# result = structured_llm.invoke("Explain PF.")# print(result)
+Production lesson: For real payroll information, the model should not invent policy. Give it trusted company data and keep calculations/business rules in deterministic backend code.
+27. Beginner Practice Checklist
+Explain AI Engineering in your own words.
+Explain the difference between API, SDK, and LangChain.
+Run a temperature experiment and record what changes.
+Explain top-p without using mathematical terminology.
+Explain tokens and context window using your own analogy.
+Create one SystemMessage, one HumanMessage, one AIMessage, and one ToolMessage.
+Run invoke() with a real model.
+Run a streaming example.
+Create a ChatPromptTemplate with two variables.
+Create a Pydantic Employee schema.
+Try structured output with a supported model integration.
+Explain why Pydantic validates structure but cannot guarantee factual truth.
+Draw the full Application → LangChain → Provider → Model flow.
+28. Quick Cheat Sheet
+Concept
+Remember it as
+Tiny mental model
+API
+A communication contract
+App ↔ Service
+SDK
+Official helper library
+Python code → Provider
+LLM
+The language model
+Input → Generated output
+Temperature
+Creativity/variation control
+Lower = usually steadier
+Top-p
+Candidate probability pool
+Choose from likely candidates
+Max tokens
+Output length limit
+Don't exceed the cap
+Hallucination
+Confident but unsupported answer
+Verify important facts
+SystemMessage
+Application instruction
+How AI should behave
+HumanMessage
+User input
+What the user asks
+AIMessage
+Model output
+What AI says
+ToolMessage
+Tool result
+What the tool returned
+Prompt Template
+Reusable request
+Prompt + variables
+Pydantic
+Data contract
+Fields + types
+invoke
+Complete synchronous result
+Wait → result
+ainvoke
+Complete async result
+await → result
+stream
+Progressive result
+chunk → chunk → chunk
+LangChain
+Application orchestration
+Compose AI components
+29. Final Mental Model
+YOUR AI APPLICATION                         │                prompts / logic / UI                         │                      LANGCHAIN          ┌──────────────┼──────────────┐       messages       models         tools          │              │              │          └──────────────┼──────────────┘                         │                 PROVIDER SDK / API                         │                 OPENAI / GROQ /               MISTRAL / GEMINI ...                         │                       MODEL                         │                    AI OUTPUT
+The goal of Weeks 1–2: You should now be able to explain what an LLM is, how a provider exposes it, what an SDK does, why LangChain exists, how messages work, how model calls run, how prompts become reusable, and how structured output gives your application predictable data.
+30. Suggested Next Step
+After Weeks 1–2, move into tools/function calling, output parsers, retrieval/RAG, embeddings, vector databases, memory/state, agents, evaluation, and production patterns. Keep the same learning method: concept → real-life analogy → tiny runnable example → small project.
